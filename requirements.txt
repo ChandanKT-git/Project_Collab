@@ -1,0 +1,23 @@
+# Core Django
+Django>=4.2,<5.0
+
+# Django Extensions
+django-guardian>=2.4.0
+
+# Production Server
+gunicorn>=21.2.0
+whitenoise>=6.5.0
+
+# Database
+psycopg2-binary>=2.9.9
+
+# Environment Management
+python-decouple>=3.8
+
+# Testing
+pytest>=7.4.0
+pytest-django>=4.5.0
+hypothesis>=6.82.0
+
+# Development Tools (optional)
+django-debug-toolbar>=4.2.0
