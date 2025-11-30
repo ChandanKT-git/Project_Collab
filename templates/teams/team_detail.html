@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ team.name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div class="flex justify-between items-start mb-4">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ team.name }}</h1>
+                <p class="text-gray-600">{{ team.description }}</p>
+            </div>
+            {% if can_edit %}
+            <div class="flex space-x-2">
+                <a href="{% url 'team_update' team.pk %}"
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition">
+                    Edit Team
+                </a>
+                <a href="{% url 'team_delete' team.pk %}"
+                    class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition">
+                    Delete Team
+                </a>
+            </div>
+            {% endif %}
+        </div>
+        <div class="text-sm text-gray-500">
+            <p>Created by {{ team.created_by.username }} on {{ team.created_at|date:"F d, Y" }}</p>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-2xl font-semibold text-gray-900">Team Members</h2>
+            {% if can_manage %}
+            <a href="{% url 'add_member' team.pk %}"
+                class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition">
+                Add Member
+            </a>
+            {% endif %}
+        </div>
+
+        {% if memberships %}
+        <div class="space-y-4">
+            {% for membership in memberships %}
+            <div class="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
+                <div>
+                    <p class="font-medium text-gray-900">{{ membership.user.username }}</p>
+                    <p class="text-sm text-gray-600">
+                        {{ membership.get_role_display }} • Joined {{ membership.joined_at|date:"F d, Y" }}
+                    </p>
+                </div>
+                {% if can_manage and membership.user != user %}
+                <div class="flex space-x-2">
+                    <a href="{% url 'change_member_role' team.pk membership.user.id %}"
+                        class="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                        Change Role
+                    </a>
+                    <a href="{% url 'remove_member' team.pk membership.user.id %}"
+                        class="text-red-600 hover:text-red-700 text-sm font-medium">
+                        Remove
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-gray-600">No members yet.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
