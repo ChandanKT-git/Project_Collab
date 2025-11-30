@@ -1,0 +1,282 @@
+{% extends 'base.html' %}
+{% load mention_tags %}
+
+{% block title %}{{ task.title }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Header -->
+    <div class="mb-6">
+        <div class="flex justify-between items-start">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">{{ task.title }}</h1>
+                <p class="text-sm text-gray-500 mt-1">
+                    Created by {{ task.created_by.username }} on {{ task.created_at|date:"M d, Y" }}
+                </p>
+            </div>
+            <div class="flex gap-2">
+                {% if can_edit %}
+                <a href="{% url 'task_update' task.pk %}"
+                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md">
+                    Edit
+                </a>
+                {% endif %}
+                {% if can_delete %}
+                <a href="{% url 'task_delete' task.pk %}"
+                    class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md">
+                    Delete
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Main Content -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Task Details -->
+            <div class="bg-white shadow rounded-lg p-6">
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">Description</h2>
+                <p class="" ext-gray-700 whitespace-pre-wrap">{{ task.description }}</p>
+            </div>
+
+            <!-- Comments Section -->
+            <div class="bg-white shadow rounded-lg p-6">
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">Comments</h2>
+
+                <!-- Add Comment Form -->
+                <form method="post" action="{% url 'comment_create' task.pk %}" class="mb-6">
+                    {% csrf_token %}
+                    {{ comment_form.content }}
+                    <button type="submit" class="mt-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md">
+                        Add Comment
+                    </button>
+                </form>
+
+                <!-- Comments List -->
+                {% if comments %}
+                <div class="space-y-6">
+                    {% for comment in comments %}
+                    <div class="border-l-4 border-gray-200 pl-4">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <p class="font-medium text-gray-900">{{ comment.author.username }}</p>
+                                <p class="text-sm text-gray-500">{{ comment.created_at|date:"M d, Y g:i A" }}</p>
+                            </div>
+                            {% if comment.author == user or can_delete %}
+                            <a href="{% url 'comment_delete' comment.pk %}"
+                                class="text-red-600 hover:text-red-800 text-sm">
+                                Delete
+                            </a>
+                            {% endif %}
+                        </div>
+                        <p class="mt-2 text-gray-700 whitespace-pre-wrap">{{ comment.content|highlight_mentions }}</p>
+
+                        <!-- Reply Button -->
+                        <button data-comment-id="{{ comment.pk }}"
+                            class="reply-toggle mt-2 text-sm text-blue-600 hover:text-blue-800">
+                            Reply
+                        </button>
+
+                        <!-- Reply Form (hidden by default) -->
+                        <div id="reply-form-{{ comment.pk }}" class="hidden mt-3">
+                            <form method="post" action="{% url 'comment_reply' comment.pk %}">
+                                {% csrf_token %}
+                                <textarea name="content" rows="2" placeholder="Write a reply..."
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                                <div class="mt-2 flex gap-2">
+                                    <button type="submit"
+                                        class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm">
+                                        Reply
+                                    </button>
+                                    <button type="button" data-comment-id="{{ comment.pk }}"
+                                        class="reply-cancel px-3 py-1 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-md text-sm">
+                                        Cancel
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Replies -->
+                        {% if comment.replies.all %}
+                        <div class="mt-4 ml-6 space-y-4">
+                            {% for reply in comment.replies.all %}
+                            <div class="border-l-4 border-blue-200 pl-4">
+                                <div class="flex items-start justify-between">
+                                    <div>
+                                        <p class="font-medium text-gray-900">{{ reply.author.username }}</p>
+                                        <p class="text-sm text-gray-500">{{ reply.created_at|date:"M d, Y g:i A" }}</p>
+                                    </div>
+                                    {% if reply.author == user or can_delete %}
+                                    <a href="{% url 'comment_delete' reply.pk %}"
+                                        class="text-red-600 hover:text-red-800 text-sm">
+                                        Delete
+                                    </a>
+                                    {% endif %}
+                                </div>
+                                <p class="mt-2 text-gray-700 whitespace-pre-wrap">{{ reply.content|highlight_mentions }}
+                                </p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-gray-500 text-center py-4">No comments yet. Be the first to comment!</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="space-y-6">
+            <!-- File Uploads -->
+            <div class="bg-white shadow rounded-lg p-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">File Attachments</h2>
+
+                <!-- Upload Form -->
+                <form method="post" action="{% url 'file_upload_task' task.pk %}" enctype="multipart/form-data"
+                    class="mb-4">
+                    {% csrf_token %}
+                    <div class="space-y-2">
+                        {{ file_upload_form.file }}
+                        <button type="submit"
+                            class="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm">
+                            Upload File
+                        </button>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">Maximum file size: 10MB</p>
+                </form>
+
+                <!-- File List -->
+                {% if task_files %}
+                <div class="space-y-2">
+                    {% for file in task_files %}
+                    <div class="flex items-center justify-between p-2 bg-gray-50 rounded">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-gray-900 truncate">{{ file.filename }}</p>
+                            <p class="text-xs text-gray-500">
+                                Uploaded by {{ file.uploaded_by.username }} on {{ file.uploaded_at|date:"M d, Y" }}
+                            </p>
+                        </div>
+                        <div class="flex gap-2 ml-2">
+                            <a href="{% url 'file_download' file.pk %}"
+                                class="text-blue-600 hover:text-blue-800 text-sm">
+                                Download
+                            </a>
+                            {% if file.uploaded_by == user or can_delete %}
+                            <form method="post" action="{% url 'file_delete' file.pk %}" class="inline">
+                                {% csrf_token %}
+                                <button type="submit"
+                                    onclick="return confirm('Are you sure you want to delete this file?')"
+                                    class="text-red-600 hover:text-red-800 text-sm">
+                                    Delete
+                                </button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-gray-500 text-sm">No files attached yet.</p>
+                {% endif %}
+            </div>
+
+            <!-- Task Info -->
+            <div class="bg-white shadow rounded-lg p-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Task Information</h2>
+                <dl class="space-y-3">
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Status</dt>
+                        <dd class="mt-1">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                                {% if task.status == 'TODO' %}bg-gray-100 text-gray-800
+                                {% elif task.status == 'IN_PROGRESS' %}bg-blue-100 text-blue-800
+                                {% elif task.status == 'REVIEW' %}bg-yellow-100 text-yellow-800
+                                {% elif task.status == 'DONE' %}bg-green-100 text-green-800
+                                {% endif %}">
+                                {{ task.get_status_display }}
+                            </span>
+                        </dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Team</dt>
+                        <dd class="mt-1 text-sm text-gray-900">
+                            <a href="{% url 'team_detail' task.team.pk %}" class="text-blue-600 hover:text-blue-800">
+                                {{ task.team.name }}
+                            </a>
+                        </dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Assigned To</dt>
+                        <dd class="mt-1 text-sm text-gray-900">
+                            {% if task.assigned_to %}
+                            {{ task.assigned_to.username }}
+                            {% else %}
+                            <span class="text-gray-400">Unassigned</span>
+                            {% endif %}
+                        </dd>
+                    </div>
+                    {% if task.deadline %}
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Deadline</dt>
+                        <dd class="mt-1 text-sm text-gray-900">{{ task.deadline|date:"M d, Y" }}</dd>
+                    </div>
+                    {% endif %}
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Last Updated</dt>
+                        <dd class="mt-1 text-sm text-gray-900">{{ task.updated_at|date:"M d, Y g:i A" }}</dd>
+                    </div>
+                </dl>
+            </div>
+
+            <!-- Activity Log -->
+            <div class="bg-white shadow rounded-lg p-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Activity Log</h2>
+                {% if activity_logs %}
+                <div class="space-y-3">
+                    {% for log in activity_logs %}
+                    <div class="text-sm">
+                        <p class="font-medium text-gray-900">{{ log.action }}</p>
+                        <p class="text-gray-500">
+                            by {{ log.user.username }} on {{ log.timestamp|date:"M d, Y g:i A" }}
+                        </p>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-gray-500 text-sm">No activity yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Handle reply toggle buttons
+        document.querySelectorAll('.reply-toggle').forEach(function (button) {
+            button.addEventListener('click', function () {
+                const commentId = this.getAttribute('data-comment-id');
+                const form = document.getElementById('reply-form-' + commentId);
+                if (form.classList.contains('hidden')) {
+                    form.classList.remove('hidden');
+                } else {
+                    form.classList.add('hidden');
+                }
+            });
+        });
+
+        // Handle reply cancel buttons
+        document.querySelectorAll('.reply-cancel').forEach(function (button) {
+            button.addEventListener('click', function () {
+                const commentId = this.getAttribute('data-comment-id');
+                const form = document.getElementById('reply-form-' + commentId);
+                form.classList.add('hidden');
+            });
+        });
+    });
+</script>
+{% endblock %}
