@@ -8,7 +8,5 @@ pip install -r requirements.txt
 echo "Collecting static files..."
 python manage.py collectstatic --no-input
 
-echo "Running migrations..."
-python manage.py migrate
-
 echo "Build complete!"
+echo "Note: Migrations will run automatically on first deployment via release command"

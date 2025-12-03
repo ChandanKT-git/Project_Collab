@@ -10,6 +10,7 @@ services:
     runtime: python
     plan: free
     buildCommand: "./build.sh"
+    preDeployCommand: "python manage.py migrate"
     startCommand: "gunicorn config.wsgi:application"
     envVars:
       - key: PYTHON_VERSION
