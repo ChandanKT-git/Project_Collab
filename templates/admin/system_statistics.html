@@ -1,0 +1,103 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}System Statistics{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <h1>System Statistics</h1>
+
+    <div
+        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">
+
+        <!-- Overall Statistics -->
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 5px; border-left: 4px solid #417690;">
+            <h2 style="margin-top: 0; color: #417690;">Overall Statistics</h2>
+            <table style="width: 100%;">
+                <tr>
+                    <td><strong>Total Users:</strong></td>
+                    <td style="text-align: right;">{{ stats.total_users }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Active Users:</strong></td>
+                    <td style="text-align: right;">{{ stats.active_users }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Total Teams:</strong></td>
+                    <td style="text-align: right;">{{ stats.total_teams }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Teams with Members:</strong></td>
+                    <td style="text-align: right;">{{ stats.teams_with_members }}</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Task Statistics -->
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 5px; border-left: 4px solid #28a745;">
+            <h2 style="margin-top: 0; color: #28a745;">Task Statistics</h2>
+            <table style="width: 100%;">
+                <tr>
+                    <td><strong>Total Tasks:</strong></td>
+                    <td style="text-align: right;">{{ stats.total_tasks }}</td>
+                </tr>
+                <tr>
+                    <td><strong>To Do:</strong></td>
+                    <td style="text-align: right;">{{ stats.tasks_todo }}</td>
+                </tr>
+                <tr>
+                    <td><strong>In Progress:</strong></td>
+                    <td style="text-align: right;">{{ stats.tasks_in_progress }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Review:</strong></td>
+                    <td style="text-align: right;">{{ stats.tasks_review }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Done:</strong></td>
+                    <td style="text-align: right;">{{ stats.tasks_done }}</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Content Statistics -->
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 5px; border-left: 4px solid #ffc107;">
+            <h2 style="margin-top: 0; color: #ffc107;">Content Statistics</h2>
+            <table style="width: 100%;">
+                <tr>
+                    <td><strong>Total Comments:</strong></td>
+                    <td style="text-align: right;">{{ stats.total_comments }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Total File Uploads:</strong></td>
+                    <td style="text-align: right;">{{ stats.total_file_uploads }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Total Activity Logs:</strong></td>
+                    <td style="text-align: right;">{{ stats.total_activity_logs }}</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Notification Statistics -->
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 5px; border-left: 4px solid #dc3545;">
+            <h2 style="margin-top: 0; color: #dc3545;">Notification Statistics</h2>
+            <table style="width: 100%;">
+                <tr>
+                    <td><strong>Total Notifications:</strong></td>
+                    <td style="text-align: right;">{{ stats.total_notifications }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Unread Notifications:</strong></td>
+                    <td style="text-align: right;">{{ stats.unread_notifications }}</td>
+                </tr>
+            </table>
+        </div>
+
+    </div>
+
+    <div style="margin-top: 30px;">
+        <a href="{% url 'admin:index' %}" class="button">Back to Admin Home</a>
+    </div>
+</div>
+{% endblock %}

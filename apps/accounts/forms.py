@@ -6,6 +6,22 @@ from django.core.exceptions import ValidationError
 
 class SignupForm(UserCreationForm):
     """Custom signup form with email validation"""
+    first_name = forms.CharField(
+        required=True,
+        max_length=150,
+        widget=forms.TextInput(attrs={
+            'class': 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
+            'placeholder': 'First Name'
+        })
+    )
+    last_name = forms.CharField(
+        required=True,
+        max_length=150,
+        widget=forms.TextInput(attrs={
+            'class': 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
+            'placeholder': 'Last Name'
+        })
+    )
     email = forms.EmailField(
         required=True,
         widget=forms.EmailInput(attrs={
@@ -36,7 +52,7 @@ class SignupForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password1', 'password2']
+        fields = ['first_name', 'last_name', 'username', 'email', 'password1', 'password2']
 
     def clean_email(self):
         """Validate that the email is unique"""

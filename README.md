@@ -157,6 +157,34 @@ EMAIL_HOST_PASSWORD=your-app-password
 
 **Important**: Never commit `.env` files or expose secret keys in version control.
 
+## Seed Demo Data (Optional)
+
+Populate the database with realistic demo data for testing and demonstration:
+
+```bash
+# Seed the database with demo users, teams, tasks, and comments
+python manage.py seed_data
+
+# Or clear existing data and re-seed
+python manage.py seed_data --clear
+```
+
+**Demo Users Created:**
+- Username: `admin` | Password: `admin123` (Admin)
+- Username: `john` | Password: `john123`
+- Username: `sarah` | Password: `sarah123`
+- Username: `mike` | Password: `mike123`
+- Username: `emma` | Password: `emma123`
+
+The seed data includes:
+- 5 demo users
+- 4 teams (Web Dev, Mobile, DevOps, Design)
+- 13 tasks with various statuses
+- 17 comments with threading
+- 6 notifications
+
+See [SEED_DATA_INFO.md](SEED_DATA_INFO.md) for complete details.
+
 ## Running the Application
 
 ### Development Server

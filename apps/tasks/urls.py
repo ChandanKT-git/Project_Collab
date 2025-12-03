@@ -14,4 +14,6 @@ urlpatterns = [
     path('comment/<int:comment_pk>/upload/', views.file_upload_comment, name='file_upload_comment'),
     path('file/<int:file_pk>/download/', views.file_download, name='file_download'),
     path('file/<int:file_pk>/delete/', views.file_delete, name='file_delete'),
+    # API endpoint for getting team members
+    path('api/team/<int:team_id>/members/', views.get_team_members, name='get_team_members'),
 ]

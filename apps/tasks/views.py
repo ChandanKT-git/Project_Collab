@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q
-from django.http import FileResponse, Http404
+from django.http import FileResponse, Http404, JsonResponse
 from django.contrib.contenttypes.models import ContentType
 from guardian.shortcuts import get_objects_for_user, assign_perm, remove_perm
 from .models import Task, Comment, FileUpload, ActivityLog
@@ -45,6 +45,13 @@ def task_list(request):
 @login_required
 def task_create(request):
     """Create a new task."""
+    # Check if user is a member of any team
+    user_teams = Team.objects.filter(memberships__user=request.user)
+    
+    if not user_teams.exists():
+        messages.warning(request, 'You need to create or join a team before creating tasks.')
+        return redirect('team_create')
+    
     if request.method == 'POST':
         form = TaskForm(request.POST, user=request.user)
         if form.is_valid():
@@ -416,3 +423,33 @@ def file_delete(request, file_pk):
     
     # For GET requests, redirect to task detail
     return redirect('task_detail', pk=task.pk)
+
+
+@login_required
+def get_team_members(request, team_id):
+    """API endpoint to get team members for a specific team."""
+    try:
+        team = get_object_or_404(Team, pk=team_id)
+        
+        # Check if user is a member of this team
+        if not TeamMembership.objects.filter(team=team, user=request.user).exists():
+            return JsonResponse({'error': 'You do not have permission to view this team'}, status=403)
+        
+        # Get all team members
+        members = TeamMembership.objects.filter(team=team).select_related('user')
+        
+        # Format response
+        members_data = [
+            {
+                'id': membership.user.id,
+                'username': membership.user.username,
+                'full_name': membership.user.get_full_name() or membership.user.username,
+                'role': membership.role
+            }
+            for membership in members
+        ]
+        
+        return JsonResponse({'members': members_data})
+    
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

@@ -24,13 +24,19 @@ class TaskForm(forms.ModelForm):
             user_teams = Team.objects.filter(memberships__user=user)
             self.fields['team'].queryset = user_teams
             
+            # Check if user has any teams
+            if not user_teams.exists():
+                self.fields['team'].help_text = 'You need to create or join a team first before creating tasks.'
+            
             # If editing an existing task, limit assigned_to to team members
             if self.instance and self.instance.pk:
                 team_members = User.objects.filter(team_memberships__team=self.instance.team)
                 self.fields['assigned_to'].queryset = team_members
             else:
-                # For new tasks, we'll update this dynamically or leave it open
-                self.fields['assigned_to'].queryset = User.objects.all()
+                # For new tasks, start with empty queryset - will be populated via JavaScript
+                self.fields['assigned_to'].queryset = User.objects.none()
+                self.fields['assigned_to'].help_text = 'Select a team first to see available members'
+                self.fields['assigned_to'].required = False
     
     def clean_title(self):
         """Validate task title."""
