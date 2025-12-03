@@ -1,0 +1,32 @@
+databases:
+  - name: collabhub-db
+    databaseName: collabhub
+    user: collabhub
+    plan: free
+
+services:
+  - type: web
+    name: collabhub
+    runtime: python
+    plan: free
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn config.wsgi:application"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings_production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: False
+      - key: USE_S3
+        value: False
+      - key: SECURE_SSL_REDIRECT
+        value: True
+      - key: SESSION_COOKIE_SECURE
+        value: True
+      - key: CSRF_COOKIE_SECURE
+        value: True
+      - key: SECURE_HSTS_SECONDS
+        value: 31536000
