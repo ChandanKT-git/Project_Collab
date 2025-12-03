@@ -85,8 +85,17 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# Check if PostgreSQL environment variables are set
-if config('DB_NAME', default=None):
+# Try DATABASE_URL first (for Render/Heroku), then individual vars, then SQLite
+DATABASE_URL = config('DATABASE_URL', default=None)
+
+if DATABASE_URL:
+    # Use DATABASE_URL if provided (Render, Heroku, etc.)
+    import dj_database_url
+    DATABASES = {
+        'default': dj_database_url.parse(DATABASE_URL)
+    }
+elif config('DB_NAME', default=None):
+    # Use individual PostgreSQL environment variables
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
