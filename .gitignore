@@ -58,6 +58,7 @@ Thumbs.db
 .env.production
 
 # Documentation/Guide Files (Keep locally, don't commit)
+AWS_S3_SETUP.md
 CHANGELOG.md
 COMMIT_CHECKLIST.md
 COMMIT_MESSAGE.txt
@@ -66,10 +67,12 @@ CONTRIBUTING.md
 DEPLOYMENT_GUIDE.md
 DEPLOYMENT_SUMMARY.md
 DEPLOYMENT.md
+ENV_AND_S3_SETUP_SUMMARY.txt
 GIT_COMMIT_GUIDE.md
 GITHUB_SETUP.md
 HOW_TO_COMMIT.txt
 QUICK_DEPLOY.md
+QUICK_ENV_REFERENCE.txt
 QUICK_REFERENCE.txt
 README_GIT_GUIDES.md
 SECURITY_FIX_TASK_ASSIGNEE.md
@@ -79,6 +82,8 @@ SUMMARY.txt
 TEMPLATE_VERIFICATION.md
 UI_IMPROVEMENTS_SUMMARY.md
 VALIDATION_AND_ERROR_HANDLING.md
+check_env_setup.py
 check_git_files.bat
 check_git_files.sh
 test_deployment_config.py
+test_s3.py

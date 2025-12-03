@@ -29,17 +29,42 @@ DATABASES = {
     }
 }
 
-# Static files (CSS, JavaScript, Images)
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATIC_URL = '/static/'
+# AWS S3 Configuration (for production file storage)
+USE_S3 = config('USE_S3', default=False, cast=bool)
 
-# Use WhiteNoise for static file serving
-MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+if USE_S3:
+    # AWS Settings
+    AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
+    AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
+    AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
+    AWS_S3_REGION_NAME = config('AWS_S3_REGION_NAME', default='us-east-1')
+    AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+    AWS_S3_OBJECT_PARAMETERS = {
+        'CacheControl': 'max-age=86400',
+    }
+    AWS_DEFAULT_ACL = 'public-read'
+    AWS_S3_FILE_OVERWRITE = False
+    AWS_QUERYSTRING_AUTH = False
+    
+    # S3 Static Settings
+    STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
+    
+    # S3 Media Settings
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
+else:
+    # Static files (CSS, JavaScript, Images)
+    STATIC_ROOT = BASE_DIR / 'staticfiles'
+    STATIC_URL = '/static/'
 
-# Media files
-MEDIA_ROOT = BASE_DIR / 'media'
-MEDIA_URL = '/media/'
+    # Use WhiteNoise for static file serving
+    MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+    # Media files
+    MEDIA_ROOT = BASE_DIR / 'media'
+    MEDIA_URL = '/media/'
 
 # Email configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
