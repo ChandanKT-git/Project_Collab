@@ -16,6 +16,14 @@ SECRET_KEY = config('SECRET_KEY')
 # Allowed hosts
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 
+# CSRF Trusted Origins - for Railway and other deployments
+# This fixes "Origin checking failed" CSRF errors
+CSRF_TRUSTED_ORIGINS = config(
+    'CSRF_TRUSTED_ORIGINS',
+    default='https://projectcollab-production.up.railway.app',
+    cast=Csv()
+)
+
 # Database
 # Use DATABASE_URL environment variable for production database
 import dj_database_url
