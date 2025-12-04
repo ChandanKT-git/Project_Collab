@@ -29,6 +29,13 @@ DEBUG = config('DEBUG', default=True, cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=Csv())
 
+# CSRF Trusted Origins - for Railway and other deployments
+csrf_origins = config('CSRF_TRUSTED_ORIGINS', default='')
+if csrf_origins:
+    CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in csrf_origins.split(',')]
+else:
+    # Fallback: construct from ALLOWED_HOSTS
+    CSRF_TRUSTED_ORIGINS = [f'https://{host}' for host in ALLOWED_HOSTS if host and host not in ['localhost', '127.0.0.1']]
 
 # Application definition
 
@@ -227,6 +234,34 @@ DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@projectportal
 
 # Notification batching settings
 NOTIFICATION_BATCH_WINDOW = 300  # 5 minutes in seconds
+
+# Security settings (production)
+if not DEBUG:
+    # Use WhiteNoise for static file serving in production (if not using S3)
+    if not USE_S3:
+        MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
+        STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+    
+    # SSL/HTTPS settings
+    SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=True, cast=bool)
+    SESSION_COOKIE_SECURE = config('SESSION_COOKIE_SECURE', default=True, cast=bool)
+    CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE', default=True, cast=bool)
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = 'DENY'
+    SECURE_HSTS_SECONDS = config('SECURE_HSTS_SECONDS', default=31536000, cast=int)
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    
+    # Additional CSRF settings for Railway/production
+    CSRF_COOKIE_HTTPONLY = False  # Must be False for AJAX requests
+    CSRF_USE_SESSIONS = False
+    CSRF_COOKIE_SAMESITE = 'Lax'
+    
+    # Admin email for error notifications
+    ADMINS = [
+        ('Admin', config('ADMIN_EMAIL', default='admin@projectportal.com')),
+    ]
 
 # Logging configuration
 LOGGING = {
