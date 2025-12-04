@@ -7,14 +7,11 @@ cmds = [
     ". /opt/venv/bin/activate && pip install -r requirements.txt"
 ]
 
-# Build phase: only dependency installation, no collectstatic (needs AWS creds)
+# Build phase: only dependency installation
 [phases.build]
 cmds = []
 
-# Release phase: run migrations once per deploy (cleaner than every start)
-[release]
-cmd = "python manage.py migrate"
-
-# Start phase: collectstatic (S3 upload) + launch Gunicorn
+# Start phase: run migrations and launch Gunicorn
+# Migrations run at startup when database IS available
 [start]
-cmd = "python manage.py collectstatic --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:$PORT"
+cmd = "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:$PORT"

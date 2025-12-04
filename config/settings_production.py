@@ -20,16 +20,28 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 # Use DATABASE_URL environment variable for production database
 import dj_database_url
 
-# Try to use DATABASE_URL first (Render's format), fall back to individual vars
+# Try DATABASE_URL first (Render/Railway), then Railway vars, then custom vars
 DATABASE_URL = config('DATABASE_URL', default=None)
 
 if DATABASE_URL:
-    # Render provides DATABASE_URL
+    # Render/Railway provides DATABASE_URL
     DATABASES = {
         'default': dj_database_url.parse(DATABASE_URL)
     }
+elif config('PGDATABASE', default=None):
+    # Railway's PostgreSQL environment variables
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': config('PGDATABASE'),
+            'USER': config('PGUSER'),
+            'PASSWORD': config('PGPASSWORD'),
+            'HOST': config('PGHOST'),
+            'PORT': config('PGPORT', default='5432'),
+        }
+    }
 else:
-    # Fallback to individual environment variables
+    # Fallback to custom environment variables
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',

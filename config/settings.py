@@ -85,17 +85,29 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# Try DATABASE_URL first (for Render/Heroku), then individual vars, then SQLite
+# Try DATABASE_URL first (for Render/Heroku/Railway), then Railway vars, then individual vars, then SQLite
 DATABASE_URL = config('DATABASE_URL', default=None)
 
 if DATABASE_URL:
-    # Use DATABASE_URL if provided (Render, Heroku, etc.)
+    # Use DATABASE_URL if provided (Render, Heroku, Railway, etc.)
     import dj_database_url
     DATABASES = {
         'default': dj_database_url.parse(DATABASE_URL)
     }
+elif config('PGDATABASE', default=None):
+    # Use Railway's PostgreSQL environment variables
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': config('PGDATABASE'),
+            'USER': config('PGUSER'),
+            'PASSWORD': config('PGPASSWORD'),
+            'HOST': config('PGHOST'),
+            'PORT': config('PGPORT', default='5432'),
+        }
+    }
 elif config('DB_NAME', default=None):
-    # Use individual PostgreSQL environment variables
+    # Use custom PostgreSQL environment variables
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
