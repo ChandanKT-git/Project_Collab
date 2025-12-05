@@ -220,10 +220,18 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 
 # Email configuration
-if DEBUG:
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-else:
-    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# Allow override via environment variable for testing
+EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
+
+# If DEBUG and no explicit backend set, use console for safety
+if DEBUG and not config('EMAIL_BACKEND', default=None):
+    # Check if email credentials are configured
+    if config('EMAIL_HOST_USER', default='') and config('EMAIL_HOST_PASSWORD', default=''):
+        # Use SMTP if credentials are provided
+        EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    else:
+        # Use console backend if no credentials
+        EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
 EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)

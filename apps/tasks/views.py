@@ -148,11 +148,10 @@ def task_update(request, pk):
         form = TaskForm(request.POST, instance=task, user=request.user)
         if form.is_valid():
             # Store the user who made the update for activity logging
-            task = form.save()
-            
-            # Update activity log with the actual user making the change
-            # Note: The signal handler will create a log, but we could enhance it
-            # to track the actual user making the change
+            task = form.save(commit=False)
+            # Store the updating user in a temporary attribute for the signal
+            task._updating_user = request.user
+            task.save()
             
             messages.success(request, f'Task "{task.title}" updated successfully!')
             return redirect('task_detail', pk=task.pk)

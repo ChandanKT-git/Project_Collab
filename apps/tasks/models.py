@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_save, post_delete, pre_save
 from django.dispatch import receiver
 from apps.teams.models import Team
 
@@ -111,9 +111,25 @@ class ActivityLog(models.Model):
 
 # Signal handlers for automatic activity logging
 
+@receiver(pre_save, sender=Task)
+def capture_old_task_state(sender, instance, **kwargs):
+    """Capture the old state of the task before saving."""
+    if instance.pk:
+        try:
+            old_instance = Task.objects.get(pk=instance.pk)
+            instance._old_assigned_to = old_instance.assigned_to
+        except Task.DoesNotExist:
+            instance._old_assigned_to = None
+    else:
+        instance._old_assigned_to = None
+
+
 @receiver(post_save, sender=Task)
 def log_task_creation_or_update(sender, instance, created, **kwargs):
     """Log task creation or update events."""
+    # Get the user who made the change (from view or default to creator)
+    updating_user = getattr(instance, '_updating_user', instance.created_by)
+    
     if created:
         ActivityLog.objects.create(
             task=instance,
@@ -140,17 +156,29 @@ def log_task_creation_or_update(sender, instance, created, **kwargs):
                 assign_perm('tasks.delete_task', membership.user, instance)
         
         # Send assignment notification email if task is assigned
-        if instance.assigned_to:
+        if instance.assigned_to and instance.assigned_to != instance.created_by:
             from apps.notifications.services import NotificationService, EmailService
-            notification = NotificationService.create_assignment_notification(instance)
+            from apps.notifications.models import Notification
+            # Create notification with proper sender
+            message = f"{instance.created_by.username} assigned you to task '{instance.title}'"
+            notification = NotificationService.create_notification(
+                recipient=instance.assigned_to,
+                sender=instance.created_by,
+                notification_type=Notification.ASSIGNMENT,
+                message=message,
+                content_object=instance
+            )
             if notification:
                 EmailService.send_notification_email(notification)
     else:
         # For updates, we need to track what changed
-        # This is a simplified version - in production you might want to track specific field changes
+        # Get old assigned_to from pre_save signal
+        old_assigned_to = getattr(instance, '_old_assigned_to', None)
+        
+        # Log the update
         ActivityLog.objects.create(
             task=instance,
-            user=instance.created_by,  # In a real app, you'd track the actual user making the change
+            user=updating_user,
             action='Task updated',
             details={
                 'title': instance.title,
@@ -158,6 +186,23 @@ def log_task_creation_or_update(sender, instance, created, **kwargs):
                 'assigned_to': instance.assigned_to.username if instance.assigned_to else None,
             }
         )
+        
+        # Send assignment notification if assignee changed
+        if instance.assigned_to and old_assigned_to != instance.assigned_to:
+            # Don't notify if user assigned task to themselves
+            if instance.assigned_to != updating_user:
+                from apps.notifications.services import NotificationService, EmailService
+                from apps.notifications.models import Notification
+                message = f"{updating_user.username} assigned you to task '{instance.title}'"
+                notification = NotificationService.create_notification(
+                    recipient=instance.assigned_to,
+                    sender=updating_user,
+                    notification_type=Notification.ASSIGNMENT,
+                    message=message,
+                    content_object=instance
+                )
+                if notification:
+                    EmailService.send_notification_email(notification)
 
 
 @receiver(post_save, sender=Comment)
