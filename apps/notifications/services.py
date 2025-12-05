@@ -262,7 +262,7 @@ class EmailService:
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[notification.recipient.email],
                 html_message=html_message,
-                fail_silently=False,
+                fail_silently=True,  # Don't raise exceptions on email failures
             )
             
             logger.info(f"Email sent to {notification.recipient.email} for notification {notification.id}")
@@ -270,6 +270,7 @@ class EmailService:
             
         except Exception as e:
             logger.error(f"Failed to send email for notification {notification.id}: {str(e)}")
+            # Don't re-raise the exception - just log it and continue
             return False
     
     @classmethod
