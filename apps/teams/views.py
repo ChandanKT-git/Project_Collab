@@ -137,7 +137,15 @@ def add_member(request, pk):
         if form.is_valid():
             user = form.cleaned_data['username']
             role = form.cleaned_data['role']
-            TeamMembership.objects.create(team=team, user=user, role=role)
+            # Create membership and pass adder info to signal
+            from django.db.models.signals import post_save
+            from apps.teams.models import TeamMembership
+            
+            # Temporarily store adder in a way the signal can access
+            membership = TeamMembership(team=team, user=user, role=role)
+            membership._adder = request.user  # Store adder as instance attribute
+            membership.save()
+            
             messages.success(request, f'User "{user.username}" added to team successfully!')
             return redirect('team_detail', pk=team.pk)
     else:

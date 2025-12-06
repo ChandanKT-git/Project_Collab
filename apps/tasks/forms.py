@@ -33,10 +33,10 @@ class TaskForm(forms.ModelForm):
                 team_members = User.objects.filter(team_memberships__team=self.instance.team)
                 self.fields['assigned_to'].queryset = team_members
             else:
-                # For new tasks, start with empty queryset - will be populated via JavaScript
-                self.fields['assigned_to'].queryset = User.objects.none()
+                # For new tasks, we need to allow any user for form validation
+                # The clean() method will validate they're a team member
+                self.fields['assigned_to'].queryset = User.objects.all()
                 self.fields['assigned_to'].help_text = 'Select a team first to see available members'
-                self.fields['assigned_to'].required = False
     
     def clean_title(self):
         """Validate task title."""

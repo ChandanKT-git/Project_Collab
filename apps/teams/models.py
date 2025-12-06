@@ -73,3 +73,44 @@ def assign_membership_permissions(sender, instance, created, **kwargs):
             assign_perm('teams.change_team', instance.user, instance.team)
             assign_perm('teams.delete_team', instance.user, instance.team)
             assign_perm('teams.manage_members', instance.user, instance.team)
+
+
+@receiver(post_save, sender=TeamMembership)
+def notify_new_team_member(sender, instance, created, **kwargs):
+    """Send notification when user is added to team."""
+    if not created:
+        return
+    
+    # Get the adder from instance attribute (set by view) or default to team creator
+    adder = getattr(instance, '_adder', instance.team.created_by)
+    
+    # Don't notify if user added themselves
+    if adder == instance.user:
+        return
+    
+    # Import here to avoid circular imports
+    from apps.notifications.services import NotificationService, EmailService
+    from django.db import transaction
+    import logging
+    
+    logger = logging.getLogger(__name__)
+    
+    try:
+        # Create notification
+        notification = NotificationService.create_team_addition_notification(
+            team=instance.team,
+            new_member=instance.user,
+            adder=adder
+        )
+        
+        # Send email after transaction commits
+        def send_email():
+            try:
+                EmailService.send_notification_email(notification)
+            except Exception as e:
+                logger.error(f"Failed to send team addition email: {str(e)}")
+        
+        transaction.on_commit(send_email)
+        
+    except Exception as e:
+        logger.error(f"Failed to create team addition notification: {str(e)}")

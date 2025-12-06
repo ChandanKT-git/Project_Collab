@@ -222,21 +222,27 @@ def log_comment_creation(sender, instance, created, **kwargs):
         
         # Create notifications for mentioned users and send emails
         from apps.notifications.services import NotificationService, EmailService
+        from django.db import transaction
+        
         notifications = NotificationService.create_mention_notifications(instance)
         
-        # Send email for each mention notification
+        # Send email for each mention notification after transaction commits
         for notification in notifications:
-            EmailService.send_notification_email(notification)
+            transaction.on_commit(
+                lambda n=notification: EmailService.send_notification_email(n)
+            )
 
 
 @receiver(post_save, sender=FileUpload)
 def log_file_upload(sender, instance, created, **kwargs):
-    """Log file upload events."""
+    """Log file upload events and create notifications."""
     if created:
         # Only log if the file is attached to a Task
         if isinstance(instance.content_object, Task):
+            task = instance.content_object
+            
             ActivityLog.objects.create(
-                task=instance.content_object,
+                task=task,
                 user=instance.uploaded_by,
                 action='File uploaded',
                 details={
@@ -244,6 +250,33 @@ def log_file_upload(sender, instance, created, **kwargs):
                     'file_id': instance.id,
                 }
             )
+            
+            # Identify recipients (task creator and assigned user)
+            recipients = set()
+            if task.created_by:
+                recipients.add(task.created_by)
+            if task.assigned_to:
+                recipients.add(task.assigned_to)
+            
+            # Exclude the uploader from recipients
+            recipients.discard(instance.uploaded_by)
+            
+            # Create notifications for each recipient
+            from apps.notifications.services import NotificationService, EmailService
+            from django.db import transaction
+            
+            for recipient in recipients:
+                notification = NotificationService.create_file_upload_notification(
+                    file_upload=instance,
+                    task=task,
+                    recipient=recipient
+                )
+                
+                # Send email after transaction commits
+                if notification:
+                    transaction.on_commit(
+                        lambda n=notification: EmailService.send_notification_email(n)
+                    )
 
 
 @receiver(post_delete, sender=FileUpload)

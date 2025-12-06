@@ -9,11 +9,15 @@ class Notification(models.Model):
     MENTION = 'mention'
     ASSIGNMENT = 'assignment'
     COMMENT = 'comment'
+    TEAM_ADDED = 'team_added'
+    FILE_UPLOADED = 'file_uploaded'
     
     TYPE_CHOICES = [
         (MENTION, 'Mention'),
         (ASSIGNMENT, 'Task Assignment'),
         (COMMENT, 'Comment'),
+        (TEAM_ADDED, 'Team Added'),
+        (FILE_UPLOADED, 'File Uploaded'),
     ]
     
     recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
