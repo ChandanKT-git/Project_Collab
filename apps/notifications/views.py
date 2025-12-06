@@ -8,7 +8,11 @@ from .services import NotificationService
 @login_required
 def notification_list(request):
     """Display list of notifications for the current user."""
-    notifications = Notification.objects.filter(recipient=request.user)
+    # Optimize query with select_related to reduce database hits
+    notifications = Notification.objects.filter(
+        recipient=request.user
+    ).select_related('sender', 'content_type')[:50]  # Limit to recent 50
+    
     unread_count = NotificationService.get_unread_count(request.user)
     
     context = {

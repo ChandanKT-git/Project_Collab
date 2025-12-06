@@ -14,12 +14,23 @@ import os
 @login_required
 def task_list(request):
     """Display all tasks the user has permission to access with filtering."""
-    # Get all teams where user is a member
-    user_teams = Team.objects.filter(memberships__user=request.user)
+    from django.core.paginator import Paginator
     
-    # Get all tasks from those teams
-    tasks = Task.objects.filter(team__in=user_teams).select_related(
+    # Get all teams where user is a member (optimized with only())
+    user_teams = Team.objects.filter(
+        memberships__user=request.user
+    ).only('id', 'name')
+    
+    # Get all tasks from those teams with optimized query
+    tasks = Task.objects.filter(
+        team__in=user_teams
+    ).select_related(
         'team', 'created_by', 'assigned_to'
+    ).only(
+        'id', 'title', 'status', 'deadline', 'created_at',
+        'team__id', 'team__name',
+        'created_by__id', 'created_by__username', 'created_by__first_name', 'created_by__last_name',
+        'assigned_to__id', 'assigned_to__username', 'assigned_to__first_name', 'assigned_to__last_name'
     )
     
     # Apply filters
@@ -32,8 +43,14 @@ def task_list(request):
     if status_filter:
         tasks = tasks.filter(status=status_filter)
     
+    # Add pagination (25 tasks per page)
+    paginator = Paginator(tasks, 25)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+    
     context = {
-        'tasks': tasks,
+        'tasks': page_obj,
+        'page_obj': page_obj,
         'user_teams': user_teams,
         'status_choices': Task.STATUS_CHOICES,
         'selected_team': team_filter,
@@ -86,7 +103,11 @@ def task_create(request):
 @login_required
 def task_detail(request, pk):
     """Display task details with comments and activity log."""
-    task = get_object_or_404(Task, pk=pk)
+    # Optimize task query with select_related
+    task = get_object_or_404(
+        Task.objects.select_related('team', 'created_by', 'assigned_to'),
+        pk=pk
+    )
     
     # Check if user has permission to view this task
     # User must be a member of the team
@@ -94,22 +115,39 @@ def task_detail(request, pk):
         messages.error(request, 'You do not have permission to view this task.')
         return redirect('task_list')
     
-    # Get comments and activity logs
-    comments = task.comments.filter(parent__isnull=True).select_related('author').prefetch_related('replies__author')
-    activity_logs = task.activity_logs.select_related('user').all()
+    # Get comments with optimized prefetch for nested replies
+    comments = task.comments.filter(
+        parent__isnull=True
+    ).select_related(
+        'author'
+    ).prefetch_related(
+        'replies__author'
+    ).only(
+        'id', 'content', 'created_at', 'author__id', 'author__username', 'author__first_name', 'author__last_name'
+    )
     
-    # Get file uploads for the task
+    # Get activity logs with optimized query
+    activity_logs = task.activity_logs.select_related('user').only(
+        'id', 'action', 'details', 'timestamp', 'user__id', 'user__username'
+    )[:20]  # Limit to recent 20 activities
+    
+    # Get file uploads for the task with optimized query
     task_content_type = ContentType.objects.get_for_model(Task)
     task_files = FileUpload.objects.filter(
         content_type=task_content_type,
         object_id=task.pk
-    ).select_related('uploaded_by')
-    
-    # Check permissions
-    can_edit = (
-        TeamMembership.objects.filter(team=task.team, user=request.user, role=TeamMembership.OWNER).exists()
-        or task.created_by == request.user
+    ).select_related('uploaded_by').only(
+        'id', 'file', 'uploaded_at', 'uploaded_by__id', 'uploaded_by__username'
     )
+    
+    # Check permissions (optimized to reuse existing query)
+    user_membership = TeamMembership.objects.filter(
+        team=task.team, user=request.user
+    ).only('role').first()
+    
+    can_edit = (
+        user_membership and user_membership.role == TeamMembership.OWNER
+    ) or task.created_by == request.user
     can_delete = can_edit
     
     # Create forms

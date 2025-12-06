@@ -99,7 +99,7 @@ if DATABASE_URL:
     # Use DATABASE_URL if provided (Render, Heroku, Railway, etc.)
     import dj_database_url
     DATABASES = {
-        'default': dj_database_url.parse(DATABASE_URL)
+        'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600)
     }
 elif config('PGDATABASE', default=None):
     # Use Railway's PostgreSQL environment variables
@@ -111,6 +111,10 @@ elif config('PGDATABASE', default=None):
             'PASSWORD': config('PGPASSWORD'),
             'HOST': config('PGHOST'),
             'PORT': config('PGPORT', default='5432'),
+            'CONN_MAX_AGE': 600,  # Connection pooling: keep connections alive for 10 minutes
+            'OPTIONS': {
+                'connect_timeout': 10,
+            }
         }
     }
 elif config('DB_NAME', default=None):
@@ -123,6 +127,10 @@ elif config('DB_NAME', default=None):
             'PASSWORD': config('DB_PASSWORD'),
             'HOST': config('DB_HOST', default='localhost'),
             'PORT': config('DB_PORT', default='5432'),
+            'CONN_MAX_AGE': 600,  # Connection pooling: keep connections alive for 10 minutes
+            'OPTIONS': {
+                'connect_timeout': 10,
+            }
         }
     }
 else:
@@ -131,6 +139,7 @@ else:
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'db.sqlite3',
+            'CONN_MAX_AGE': 600,  # Connection pooling even for SQLite
         }
     }
 
@@ -153,6 +162,23 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
+# Caching Configuration
+# https://docs.djangoproject.com/en/5.2/topics/cache/
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+        'OPTIONS': {
+            'MAX_ENTRIES': 1000,
+        }
+    }
+}
+
+# Cache timeout for various operations (in seconds)
+CACHE_MIDDLEWARE_SECONDS = 300  # 5 minutes
+CACHE_MIDDLEWARE_KEY_PREFIX = 'projectportal'
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
@@ -270,7 +296,7 @@ if not DEBUG:
     
     # Admin email for error notifications
     ADMINS = [
-        ('Admin', config('ADMIN_EMAIL', default='admin@projectportal.com')),
+        ('Admin', config('ADMIN_EMAIL', default='chandukt29092004@gmail.com')),
     ]
 
 # Logging configuration
