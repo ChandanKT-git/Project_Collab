@@ -19,7 +19,7 @@
                 <select name="team" id="team" class="w-full border-gray-300 rounded-md shadow-sm">
                     <option value="">All Teams</option>
                     {% for team in user_teams %}
-                    <option value="{{ team.id }}" {% if selected_team==team.id %}selected{% endif %}>
+                    <option value="{{ team.id }}" {% if selected_team == team.id %}selected{% endif %}>
                         {{ team.name }}
                     </option>
                     {% endfor %}
@@ -30,7 +30,7 @@
                 <select name="status" id="status" class="w-full border-gray-300 rounded-md shadow-sm">
                     <option value="">All Statuses</option>
                     {% for value, label in status_choices %}
-                    <option value="{{ value }}" {% if selected_status==value %}selected{% endif %}>
+                    <option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>
                         {{ label }}
                     </option>
                     {% endfor %}
@@ -68,8 +68,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                     </svg>
-                                    {% if task.assigned_to %}{{ task.assigned_to.username }}{% else %}Unassigned{% endif
-                                    %}
+                                    {% if task.assigned_to %}{{ task.assigned_to.username }}{% else %}Unassigned{% endif %}
                                 </span>
                                 {% if task.deadline %}
                                 <span class="flex items-center">
@@ -140,8 +139,7 @@
             </a>
             {% endif %}
 
-            <span
-                class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+            <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
                 Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
             </span>
 

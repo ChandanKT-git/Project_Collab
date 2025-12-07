@@ -46,8 +46,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',  # Required for allauth
     # Third-party apps
     'guardian',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
     # Local apps
     'apps.accounts',
     'apps.teams',
@@ -55,6 +60,9 @@ INSTALLED_APPS = [
     'apps.notifications',
     'apps.core',
 ]
+
+# Required for django-allauth
+SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -64,6 +72,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',  # Required for django-allauth
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -234,16 +243,47 @@ if USE_S3:
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Django Guardian settings
+# Django Guardian and Allauth settings
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'guardian.backends.ObjectPermissionBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',  # For allauth
 )
 
 # Login URLs
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
+
+# Django Allauth Configuration
+ACCOUNT_LOGIN_METHODS = {'email'}  # Authenticate by email (updated from deprecated ACCOUNT_AUTHENTICATION_METHOD)
+ACCOUNT_EMAIL_VERIFICATION = 'optional'  # Can be 'mandatory', 'optional', or 'none'
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']  # Required fields (includes email and username requirements)
+ACCOUNT_SESSION_REMEMBER = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_LOGOUT_ON_GET = False
+
+# Custom Adapters for OAuth flow
+SOCIALACCOUNT_ADAPTER = 'apps.accounts.adapters.CustomSocialAccountAdapter'
+ACCOUNT_ADAPTER = 'apps.accounts.adapters.CustomAccountAdapter'
+
+# Social Account Settings
+SOCIALACCOUNT_AUTO_SIGNUP = True  # Enable automatic signup for OAuth users
+SOCIALACCOUNT_EMAIL_VERIFICATION = 'optional'
+SOCIALACCOUNT_QUERY_EMAIL = True
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        },
+        # Note: OAuth credentials are configured in Django admin (Social Applications)
+        # Do NOT use 'APP' key here as it will conflict with database configuration
+    }
+}
 
 # Email configuration
 # Allow override via environment variable for testing
@@ -367,6 +407,11 @@ LOGGING = {
             'propagate': False,
         },
         'apps.tasks': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'apps.accounts': {
             'handlers': ['console', 'file'],
             'level': 'INFO',
             'propagate': False,

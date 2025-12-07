@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign-in Cancelled - CollabHub{% endblock %}
+
+{% block content %}
+<div class="min-h-[calc(100vh-16rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div
+                class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl mb-4 shadow-lg">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </div>
+            <h2
+                class="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+                Sign-in Cancelled
+            </h2>
+            <p class="text-gray-600">You chose not to continue with Google sign-in</p>
+        </div>
+
+        <!-- Cancellation Card -->
+        <div class="glass-effect rounded-2xl shadow-xl p-8 hover-lift">
+            <!-- Info Message -->
+            <div class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 border-l-4 border-blue-500 rounded-lg">
+                <div class="flex items-start">
+                    <svg class="h-5 w-5 text-blue-500 mt-0.5 mr-3 flex-shrink-0" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div class="flex-1">
+                        <p class="text-sm font-medium text-blue-800 mb-1">
+                            No worries!
+                        </p>
+                        <p class="text-sm text-blue-700">
+                            You cancelled the Google sign-in process. Your account information remains secure and no
+                            changes were made.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- What happened -->
+            <div class="mb-6">
+                <h3 class="text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                    <svg class="w-4 h-4 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    What happened:
+                </h3>
+                <ul class="space-y-2 text-sm text-gray-600">
+                    <li class="flex items-start">
+                        <svg class="w-4 h-4 mr-2 mt-0.5 text-purple-500 flex-shrink-0" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                        <span>You started the Google sign-in process</span>
+                    </li>
+                    <li class="flex items-start">
+                        <svg class="w-4 h-4 mr-2 mt-0.5 text-purple-500 flex-shrink-0" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                        <span>You chose to cancel or close the Google sign-in window</span>
+                    </li>
+                    <li class="flex items-start">
+                        <svg class="w-4 h-4 mr-2 mt-0.5 text-purple-500 flex-shrink-0" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                        <span>No account information was shared or modified</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Navigation Options -->
+            <div class="space-y-3">
+                <!-- Try Again Button -->
+                <a href="{% url 'google_login' %}"
+                    class="w-full gradient-bg text-white py-3.5 px-4 rounded-xl font-semibold hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 flex items-center justify-center space-x-2">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path
+                            d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z" />
+                    </svg>
+                    <span>Try Again with Google</span>
+                </a>
+
+                <!-- Back to Login -->
+                <a href="{% url 'login' %}"
+                    class="w-full inline-flex items-center justify-center px-4 py-3 border-2 border-purple-200 rounded-xl text-sm font-semibold text-purple-600 hover:bg-purple-50 hover:border-purple-300 transition-all duration-200">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                    </svg>
+                    Back to Login
+                </a>
+
+                <!-- Sign Up Link -->
+                <div class="text-center pt-2">
+                    <p class="text-sm text-gray-600">
+                        Don't have an account?
+                        <a href="{% url 'account_signup' %}"
+                            class="font-semibold text-purple-600 hover:text-purple-700 transition-colors">
+                            Sign up here
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Helpful Notice -->
+        <div class="mt-8 text-center">
+            <div
+                class="inline-flex items-center justify-center space-x-2 text-xs text-gray-500 bg-white rounded-full px-4 py-2 shadow-sm">
+                <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+                <span>Your privacy and security are protected</span>
+            </div>
+            <p class="text-xs text-gray-400 mt-3">
+                You can sign in with Google anytime or use traditional login
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

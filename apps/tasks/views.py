@@ -15,14 +15,26 @@ import os
 def task_list(request):
     """Display all tasks the user has permission to access with filtering."""
     from django.core.paginator import Paginator
-    
+
     # Get all teams where user is a member (optimized with only())
     user_teams = Team.objects.filter(
         memberships__user=request.user
     ).only('id', 'name')
-    
-    # Get all tasks from those teams with optimized query
-    tasks = Task.objects.filter(
+
+    # Read GET params
+    team_param = request.GET.get('team', '')
+    status_filter = request.GET.get('status', '')
+
+    # Normalize selected_team to int or None so template comparisons work
+    try:
+        selected_team = int(team_param) if team_param else None
+    except (ValueError, TypeError):
+        selected_team = None
+
+    selected_status = status_filter or ''
+
+    # Base queryset: tasks for user's teams
+    tasks_qs = Task.objects.filter(
         team__in=user_teams
     ).select_related(
         'team', 'created_by', 'assigned_to'
@@ -32,31 +44,38 @@ def task_list(request):
         'created_by__id', 'created_by__username', 'created_by__first_name', 'created_by__last_name',
         'assigned_to__id', 'assigned_to__username', 'assigned_to__first_name', 'assigned_to__last_name'
     )
-    
-    # Apply filters
-    team_filter = request.GET.get('team')
-    status_filter = request.GET.get('status')
-    
-    if team_filter:
-        tasks = tasks.filter(team_id=team_filter)
-    
-    if status_filter:
-        tasks = tasks.filter(status=status_filter)
-    
-    # Add pagination (25 tasks per page)
-    paginator = Paginator(tasks, 25)
+
+    # Apply filters (use ints for team filter)
+    if selected_team:
+        tasks_qs = tasks_qs.filter(team_id=selected_team)
+
+    if selected_status:
+        tasks_qs = tasks_qs.filter(status=selected_status)
+
+    # Optional search query (uncomment if needed)
+    # q = request.GET.get('q')
+    # if q:
+    #     tasks_qs = tasks_qs.filter(Q(title__icontains=q) | Q(description__icontains=q))
+
+    # Ordering and pagination (25 tasks per page)
+    tasks_qs = tasks_qs.order_by('-created_at')
+    paginator = Paginator(tasks_qs, 25)
     page_number = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_number)
-    
+
     context = {
-        'tasks': page_obj,
+        # template iterates over "tasks" so give it the current page's items
+        'tasks': page_obj.object_list,
         'page_obj': page_obj,
+        'paginator': paginator,
         'user_teams': user_teams,
         'status_choices': Task.STATUS_CHOICES,
-        'selected_team': team_filter,
-        'selected_status': status_filter,
+        # pass the normalized selected values so template comparisons are type-safe
+        'selected_team': selected_team,
+        'selected_status': selected_status,
     }
     return render(request, 'tasks/task_list.html', context)
+
 
 
 @login_required

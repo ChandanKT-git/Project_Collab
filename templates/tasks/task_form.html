@@ -117,70 +117,99 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        // IDs rendered by Django form fields
         const teamSelect = document.getElementById('{{ form.team.id_for_label }}');
         const assignedToSelect = document.getElementById('{{ form.assigned_to.id_for_label }}');
 
-        if (teamSelect && assignedToSelect) {
-            // Function to update assignee options based on selected team
-            function updateAssigneeOptions() {
-                const teamId = teamSelect.value;
+        // Current values when editing (safe-escaped for JS). Use empty string if None.
+        const currentAssigneeId = "{{ form.instance.assigned_to.id|default_if_none:''|escapejs }}";
+        const currentTeamId = "{{ form.instance.team.id|default_if_none:''|escapejs }}";
 
-                if (!teamId) {
-                    // No team selected - clear assignee options
-                    assignedToSelect.innerHTML = '<option value="">---------</option>';
-                    assignedToSelect.disabled = true;
-                    return;
-                }
+        if (!teamSelect || !assignedToSelect) {
+            return;
+        }
 
-                // Show loading state
+        function setDefaultAssigneeOption() {
+            assignedToSelect.innerHTML = '<option value="">---------</option>';
+        }
+
+        // Update assignee options based on selected team
+        function updateAssigneeOptions() {
+            const teamId = teamSelect.value;
+
+            if (!teamId) {
+                // No team selected - clear assignee options and disable
+                setDefaultAssigneeOption();
                 assignedToSelect.disabled = true;
-                assignedToSelect.innerHTML = '<option value="">Loading...</option>';
+                return;
+            }
 
-                // Fetch team members
-                fetch(`/tasks/api/team/${teamId}/members/`)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Failed to fetch team members');
+            // Show loading state
+            assignedToSelect.disabled = true;
+            assignedToSelect.innerHTML = '<option value="">Loading...</option>';
+
+            // Fetch team members (adjust URL if your API path differs)
+            fetch(`/tasks/api/team/${encodeURIComponent(teamId)}/members/`, {
+                headers: { 'Accept': 'application/json' }
+            })
+                .then(response => {
+                    if (!response.ok) throw new Error('Failed to fetch team members');
+                    return response.json();
+                })
+                .then(data => {
+                    setDefaultAssigneeOption();
+
+                    if (!Array.isArray(data.members)) {
+                        // If API returns members as plain array (no wrapper), try data directly
+                        if (Array.isArray(data)) {
+                            data.forEach(member => {
+                                const option = document.createElement('option');
+                                option.value = member.id;
+                                option.textContent = member.full_name || member.username || member.email || `User ${member.id}`;
+                                assignedToSelect.appendChild(option);
+                            });
+                        } else {
+                            console.error('Unexpected members payload:', data);
                         }
-                        return response.json();
-                    })
-                    .then(data => {
-                        // Clear existing options
-                        assignedToSelect.innerHTML = '<option value="">---------</option>';
-
-                        // Add team members as options
+                    } else {
                         data.members.forEach(member => {
                             const option = document.createElement('option');
                             option.value = member.id;
-                            option.textContent = member.full_name;
+                            option.textContent = member.full_name || member.username || member.email || `User ${member.id}`;
                             assignedToSelect.appendChild(option);
                         });
+                    }
 
-                        // Enable the select
-                        assignedToSelect.disabled = false;
+                    assignedToSelect.disabled = false;
 
-                        // If editing and there's a current assignee, select it
-                        {% if form.instance.assigned_to %}
-                        assignedToSelect.value = '{{ form.instance.assigned_to.id }}';
-                        {% endif %}
-                    })
-                    .catch(error => {
-                        console.error('Error fetching team members:', error);
-                        assignedToSelect.innerHTML = '<option value="">Error loading members</option>';
-                        assignedToSelect.disabled = false;
-                    });
+                    // If editing and there's a current assignee, select it
+                    if (currentAssigneeId) {
+                        assignedToSelect.value = currentAssigneeId;
+                    }
+                })
+                .catch(err => {
+                    console.error('Error fetching team members:', err);
+                    assignedToSelect.innerHTML = '<option value="">Error loading members</option>';
+                    assignedToSelect.disabled = false;
+                });
+        }
+
+        // Listen for team selection changes
+        teamSelect.addEventListener('change', updateAssigneeOptions);
+
+        // If editing and the task already has a team, select that team and load members
+        if (currentTeamId) {
+            // set the team select value if the element exists and the option is present
+            try {
+                teamSelect.value = currentTeamId;
+            } catch (e) {
+                // ignore if something goes wrong
             }
-
-            // Listen for team selection changes
-            teamSelect.addEventListener('change', updateAssigneeOptions);
-
-            // If editing an existing task, load members for the current team
-            {% if form.instance.pk and form.instance.team %}
             updateAssigneeOptions();
-            {% else %}
+        } else {
             // For new tasks, disable assignee until team is selected
+            setDefaultAssigneeOption();
             assignedToSelect.disabled = true;
-            {% endif %}
         }
     });
 </script>

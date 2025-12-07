@@ -30,6 +30,7 @@ urlpatterns = [
     path('accounts/login/', auth_views.LoginView.as_view(template_name='accounts/login.html'), name='login'),
     path('accounts/logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('accounts/signup/', SignupView.as_view(), name='signup'),
+    path('accounts/', include('allauth.urls')),  # Allauth URLs (includes Google OAuth)
     path('teams/', include('apps.teams.urls')),
     path('tasks/', include('apps.tasks.urls')),
     path('notifications/', include('apps.notifications.urls')),
