@@ -30,9 +30,9 @@
                 <select name="status" id="status" class="w-full border-gray-300 rounded-md shadow-sm">
                     <option value="">All Statuses</option>
                     {% for value, label in status_choices %}
-                    <option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>
+                    <!-- <option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>
                         {{ label }}
-                    </option>
+                    </option> -->
                     {% endfor %}
                 </select>
             </div>
