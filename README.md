@@ -1,4 +1,4 @@
-# Project Collaboration Portal  
+# Project Collaboration Portal
 
 A Django-based web application for team collaboration, task management, and project tracking. Built with Django 4.2+, django-guardian for object-level permissions, and TailwindCSS for responsive UI design.
 
@@ -42,6 +42,12 @@ A Django-based web application for team collaboration, task management, and proj
 - SQL injection protection via Django ORM
 - XSS protection with template auto-escaping
 - File upload validation
+
+## Demo Video
+
+The demo video is available in the repository documentation.
+
+[**▶️ Watch Demo Video**](docs/media/demo_video.mp4)
 
 ## Technology Stack
 
@@ -114,20 +120,20 @@ python manage.py collectstatic
 
 For production deployment, configure the following environment variables:
 
-| Variable | Description | Default | Required |
-|----------|-------------|---------|----------|
-| `SECRET_KEY` | Django secret key for cryptographic signing | Auto-generated | Yes (Production) |
-| `DEBUG` | Enable/disable debug mode | `True` | Yes |
-| `ALLOWED_HOSTS` | Comma-separated list of allowed hosts | `[]` | Yes (Production) |
-| `DATABASE_URL` | PostgreSQL connection string | SQLite | No |
-| `EMAIL_HOST` | SMTP server hostname | `smtp.gmail.com` | No |
-| `EMAIL_PORT` | SMTP server port | `587` | No |
-| `EMAIL_HOST_USER` | SMTP username | Empty | No |
-| `EMAIL_HOST_PASSWORD` | SMTP password | Empty | No |
-| `EMAIL_USE_TLS` | Use TLS for email | `True` | No |
-| `DEFAULT_FROM_EMAIL` | Default sender email | `noreply@projectportal.com` | No |
-| `MEDIA_ROOT` | Path for uploaded files | `media/` | No |
-| `STATIC_ROOT` | Path for collected static files | `staticfiles/` | No |
+| Variable              | Description                                 | Default                     | Required         |
+| --------------------- | ------------------------------------------- | --------------------------- | ---------------- |
+| `SECRET_KEY`          | Django secret key for cryptographic signing | Auto-generated              | Yes (Production) |
+| `DEBUG`               | Enable/disable debug mode                   | `True`                      | Yes              |
+| `ALLOWED_HOSTS`       | Comma-separated list of allowed hosts       | `[]`                        | Yes (Production) |
+| `DATABASE_URL`        | PostgreSQL connection string                | SQLite                      | No               |
+| `EMAIL_HOST`          | SMTP server hostname                        | `smtp.gmail.com`            | No               |
+| `EMAIL_PORT`          | SMTP server port                            | `587`                       | No               |
+| `EMAIL_HOST_USER`     | SMTP username                               | Empty                       | No               |
+| `EMAIL_HOST_PASSWORD` | SMTP password                               | Empty                       | No               |
+| `EMAIL_USE_TLS`       | Use TLS for email                           | `True`                      | No               |
+| `DEFAULT_FROM_EMAIL`  | Default sender email                        | `noreply@projectportal.com` | No               |
+| `MEDIA_ROOT`          | Path for uploaded files                     | `media/`                    | No               |
+| `STATIC_ROOT`         | Path for collected static files             | `staticfiles/`              | No               |
 
 ### Development Settings
 
@@ -170,6 +176,7 @@ python manage.py seed_data --clear
 ```
 
 **Demo Users Created:**
+
 - Username: `admin` | Password: `admin123` (Admin)
 - Username: `john` | Password: `john123`
 - Username: `sarah` | Password: `sarah123`
@@ -177,6 +184,7 @@ python manage.py seed_data --clear
 - Username: `emma` | Password: `emma123`
 
 The seed data includes:
+
 - 5 demo users
 - 4 teams (Web Dev, Mobile, DevOps, Design)
 - 13 tasks with various statuses
@@ -340,6 +348,7 @@ project_collaboration_portal/
 ### User Roles
 
 #### Team Owner
+
 - Full administrative control over the team
 - Can add/remove members
 - Can assign roles to members
@@ -348,6 +357,7 @@ project_collaboration_portal/
 - Has all permissions on team tasks
 
 #### Team Member
+
 - Can view team details and members
 - Can create tasks within the team
 - Can view and comment on tasks
@@ -373,6 +383,7 @@ project_collaboration_portal/
 5. Click "Add"
 
 To remove a member:
+
 1. Navigate to team detail page
 2. Click "Remove" next to the member's name
 3. Confirm the removal
@@ -398,6 +409,7 @@ To remove a member:
 5. Click "Add Comment"
 
 To reply to a comment:
+
 1. Click "Reply" on the comment
 2. Type your reply
 3. Click "Submit"
@@ -423,6 +435,7 @@ To reply to a comment:
 #### Activity Log
 
 Every task has an activity log showing:
+
 - Task creation
 - Status changes
 - Comments added
@@ -445,27 +458,27 @@ class NotificationService:
     def create_notification(recipient, sender, notification_type, content_object, message):
         """
         Create a notification for a user.
-        
+
         Args:
             recipient (User): User receiving the notification
             sender (User): User who triggered the notification
             notification_type (str): Type of notification (mention, assignment, etc.)
             content_object: Related object (Task, Comment, etc.)
             message (str): Notification message
-            
+
         Returns:
             Notification: Created notification instance
         """
-        
+
     @staticmethod
     def parse_mentions(text, team):
         """
         Extract @username mentions from text.
-        
+
         Args:
             text (str): Text containing mentions
             team (Team): Team to validate mentions against
-            
+
         Returns:
             list[User]: List of mentioned users who are team members
         """
@@ -481,16 +494,16 @@ class EmailService:
     def send_mention_notification(notification):
         """
         Send email notification for a mention.
-        
+
         Args:
             notification (Notification): Notification instance
         """
-        
+
     @staticmethod
     def send_assignment_notification(task, assigned_user):
         """
         Send email notification for task assignment.
-        
+
         Args:
             task (Task): Task instance
             assigned_user (User): User assigned to the task
@@ -505,12 +518,12 @@ Located in `apps/core/permissions.py`
 def check_team_permission(user, team, permission):
     """
     Check if user has permission on a team.
-    
+
     Args:
         user (User): User to check
         team (Team): Team instance
         permission (str): Permission string (e.g., 'view_team')
-        
+
     Returns:
         bool: True if user has permission
     """
@@ -518,7 +531,7 @@ def check_team_permission(user, team, permission):
 def assign_team_permissions(user, team, role):
     """
     Assign permissions to user based on role.
-    
+
     Args:
         user (User): User to assign permissions to
         team (Team): Team instance
@@ -561,6 +574,7 @@ For comprehensive deployment instructions, see [DEPLOYMENT.md](DEPLOYMENT.md).
 ### Quick Deployment Guide
 
 #### Prerequisites
+
 - Python 3.9+
 - PostgreSQL database
 - SMTP email service
@@ -569,32 +583,37 @@ For comprehensive deployment instructions, see [DEPLOYMENT.md](DEPLOYMENT.md).
 #### Quick Start
 
 1. **Install dependencies**:
+
    ```bash
    pip install -r requirements.txt
    ```
 
 2. **Configure environment**:
+
    ```bash
    cp .env.example .env
    # Edit .env with your production values
    ```
 
 3. **Run deployment script**:
+
    ```bash
    # Linux/Mac
    chmod +x deploy.sh
    ./deploy.sh
-   
+
    # Windows
    deploy.bat
    ```
 
 4. **Check deployment readiness**:
+
    ```bash
    python manage.py check_deployment
    ```
 
 5. **Create superuser**:
+
    ```bash
    python manage.py createsuperuser
    ```
@@ -607,6 +626,7 @@ For comprehensive deployment instructions, see [DEPLOYMENT.md](DEPLOYMENT.md).
 ### Deployment Platforms
 
 The application is ready to deploy to:
+
 - **Railway**: See `railway.json` configuration
 - **PythonAnywhere**: Traditional hosting with WSGI
 - **Heroku**: See `Procfile` configuration
@@ -651,6 +671,7 @@ For detailed deployment instructions, troubleshooting, and platform-specific gui
 **Problem**: `django.db.utils.OperationalError: no such table`
 
 **Solution**: Run migrations
+
 ```bash
 python manage.py migrate
 ```
@@ -660,6 +681,7 @@ python manage.py migrate
 **Problem**: CSS/JS files not loading in production
 
 **Solution**: Collect static files
+
 ```bash
 python manage.py collectstatic --noinput
 ```
@@ -669,6 +691,7 @@ python manage.py collectstatic --noinput
 **Problem**: `PermissionDenied` when accessing resources
 
 **Solution**: Check object-level permissions
+
 ```python
 # In Django shell
 from guardian.shortcuts import assign_perm
@@ -680,6 +703,7 @@ assign_perm('view_team', user, team)
 **Problem**: Emails not being sent
 
 **Solution**: Check email configuration
+
 - Verify `EMAIL_HOST_USER` and `EMAIL_HOST_PASSWORD`
 - For Gmail, use an App Password (not your regular password)
 - Check spam folder
@@ -689,7 +713,8 @@ assign_perm('view_team', user, team)
 
 **Problem**: File uploads failing
 
-**Solution**: 
+**Solution**:
+
 - Check `MEDIA_ROOT` directory exists and is writable
 - Verify file size limits in settings
 - Check disk space
