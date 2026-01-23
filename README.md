@@ -1,4 +1,4 @@
-# Project Collaboration Portal
+# Project Collaboration Portal  
 
 A Django-based web application for team collaboration, task management, and project tracking. Built with Django 4.2+, django-guardian for object-level permissions, and TailwindCSS for responsive UI design.
 
