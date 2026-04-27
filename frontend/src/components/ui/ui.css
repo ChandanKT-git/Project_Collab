@@ -1,0 +1,335 @@
+/* Material You Component Styles */
+
+/* --- Button --- */
+.md-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  font-family: var(--md-font-family);
+  font-weight: 500;
+  text-decoration: none;
+  transition: var(--md-transition-standard);
+  border-radius: var(--md-shape-full); /* Pill shape */
+}
+
+.md-button__label {
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.1px;
+}
+
+.md-button__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Button Sizes */
+.md-button--small {
+  height: 32px;
+  padding: 0 16px;
+}
+.md-button--small.md-button--with-icon { padding-left: 12px; padding-right: 16px; }
+
+.md-button--medium {
+  height: 40px;
+  padding: 0 24px;
+}
+.md-button--medium.md-button--with-icon { padding-left: 16px; padding-right: 24px; }
+
+.md-button--large {
+  height: 48px;
+  padding: 0 32px;
+}
+.md-button--large.md-button--with-icon { padding-left: 24px; padding-right: 32px; }
+
+/* Button Variants */
+/* 1. Filled (Primary) */
+.md-button--filled.md-button--primary {
+  background-color: var(--md-primary);
+  color: var(--md-on-primary);
+}
+
+.md-button--filled.md-button--error {
+  background-color: var(--md-error);
+  color: var(--md-on-error);
+}
+
+/* 2. Tonal */
+.md-button--tonal.md-button--primary {
+  background-color: var(--md-primary-container);
+  color: var(--md-on-primary-container);
+}
+
+.md-button--tonal.md-button--secondary {
+  background-color: var(--md-secondary-container);
+  color: var(--md-on-secondary-container);
+}
+
+.md-button--tonal.md-button--error {
+  background-color: var(--md-error-container);
+  color: var(--md-on-error-container);
+}
+
+/* 3. Outlined */
+.md-button--outlined {
+  background-color: transparent;
+  border: 1px solid var(--md-outline);
+  color: var(--md-primary);
+}
+
+.md-button--outlined.md-button--error {
+  color: var(--md-error);
+  border-color: var(--md-error);
+}
+
+.md-button--outlined:focus-visible {
+  border-color: var(--md-primary);
+}
+
+/* 4. Text */
+.md-button--text {
+  background-color: transparent;
+  color: var(--md-primary);
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+.md-button--text.md-button--error {
+  color: var(--md-error);
+}
+
+.md-button--text.md-button--secondary {
+  color: var(--md-on-surface-variant);
+}
+
+/* 5. Elevated */
+.md-button--elevated {
+  background-color: var(--md-surface-container-low);
+  color: var(--md-primary);
+  box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.3);
+}
+
+.md-button--elevated:hover {
+  box-shadow: 0px 2px 6px 2px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.3);
+}
+
+/* Disabled State */
+.md-button--disabled {
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.md-button--filled.md-button--disabled,
+.md-button--elevated.md-button--disabled,
+.md-button--tonal.md-button--disabled {
+  background-color: rgba(28, 27, 31, 0.12); /* on-surface at 12% */
+  color: rgba(28, 27, 31, 0.38); /* on-surface at 38% */
+  box-shadow: none;
+}
+
+.md-button--outlined.md-button--disabled {
+  border-color: rgba(28, 27, 31, 0.12);
+  color: rgba(28, 27, 31, 0.38);
+}
+
+.md-button--text.md-button--disabled {
+  color: rgba(28, 27, 31, 0.38);
+}
+
+
+/* --- Card (Surface Container) --- */
+.md-card {
+  background-color: var(--md-surface-container-low);
+  border-radius: var(--md-shape-medium);
+  padding: 16px;
+  color: var(--md-on-surface);
+  transition: var(--md-transition-standard);
+  overflow: hidden;
+}
+
+.md-card--elevated {
+  background-color: var(--md-surface-container-low);
+  box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+}
+
+.md-card--filled {
+  background-color: var(--md-surface-container-highest);
+  border: none;
+}
+
+.md-card--outlined {
+  background-color: var(--md-surface);
+  border: 1px solid var(--md-outline-variant);
+}
+
+.md-card--interactive:hover {
+  cursor: pointer;
+}
+
+.md-card--interactive.md-card--elevated:hover {
+  box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.3), 0px 4px 8px 3px rgba(0, 0, 0, 0.15);
+}
+
+/* --- Input Field --- */
+.md-input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+.md-input-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--md-on-surface-variant);
+  padding-left: 16px;
+}
+
+.md-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background-color: var(--md-surface-container-highest);
+  border-radius: var(--md-shape-small);
+  border-bottom: 1px solid var(--md-on-surface-variant);
+  transition: var(--md-transition-standard);
+}
+
+.md-input-wrapper:hover {
+  background-color: #E2DCE5; /* Slightly darker */
+}
+
+.md-input-wrapper:focus-within {
+  border-bottom: 2px solid var(--md-primary);
+}
+
+.md-input-wrapper--error {
+  border-bottom-color: var(--md-error);
+}
+
+.md-input-wrapper--error:focus-within {
+  border-bottom-color: var(--md-error);
+}
+
+.md-input {
+  width: 100%;
+  height: 56px;
+  padding: 16px;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--md-on-surface);
+  font-family: var(--md-font-family);
+  font-size: 16px;
+}
+
+.md-input::placeholder {
+  color: var(--md-on-surface-variant);
+  opacity: 0.8;
+}
+
+.md-input:disabled {
+  color: rgba(28, 27, 31, 0.38);
+  cursor: not-allowed;
+}
+
+.md-input-icon {
+  padding: 0 16px;
+  color: var(--md-on-surface-variant);
+  display: flex;
+  align-items: center;
+}
+
+.md-input-supporting-text {
+  font-size: 12px;
+  color: var(--md-on-surface-variant);
+  padding-left: 16px;
+}
+
+.md-input-supporting-text--error {
+  color: var(--md-error);
+}
+
+/* --- Badge / Chip --- */
+.md-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: var(--md-shape-small);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.md-chip--assist {
+  background-color: transparent;
+  border: 1px solid var(--md-outline-variant);
+  color: var(--md-on-surface);
+}
+
+.md-chip--filter {
+  background-color: var(--md-secondary-container);
+  color: var(--md-on-secondary-container);
+  border: none;
+}
+
+.md-chip--input {
+  background-color: var(--md-surface-container-high);
+  color: var(--md-on-surface-variant);
+  border: 1px solid var(--md-outline-variant);
+}
+
+.md-chip--suggestion {
+  background-color: var(--md-surface-container-low);
+  color: var(--md-on-surface-variant);
+  border: none;
+}
+
+/* Status variants for chips */
+.md-chip--status-todo {
+  background-color: var(--md-surface-container-high);
+  color: var(--md-on-surface-variant);
+}
+
+.md-chip--status-inprogress {
+  background-color: var(--md-primary-container);
+  color: var(--md-on-primary-container);
+}
+
+.md-chip--status-review {
+  background-color: var(--md-tertiary-container);
+  color: var(--md-on-tertiary-container);
+}
+
+.md-chip--status-done {
+  background-color: #D3EADD; /* Custom green matching tonal style */
+  color: #0A3A1F;
+}
+
+/* --- Spinner --- */
+.md-spinner {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border: 3px solid var(--md-surface-variant);
+  border-radius: 50%;
+  border-top-color: var(--md-primary);
+  animation: spin 1s linear infinite;
+}
+
+.md-spinner--small { width: 16px; height: 16px; border-width: 2px; }
+.md-spinner--large { width: 48px; height: 48px; border-width: 4px; }
+.md-spinner--light { border-top-color: var(--md-on-primary); border-color: rgba(255,255,255,0.3); }
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
