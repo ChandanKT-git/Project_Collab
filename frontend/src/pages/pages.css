@@ -1,0 +1,109 @@
+/* Page Specific Styles */
+
+.md-page-container {
+  min-height: 100vh;
+  width: 100%;
+  background-color: var(--md-surface-container-lowest);
+  padding: 24px;
+}
+
+/* Login Page */
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 32px 24px;
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.login-title {
+  color: var(--md-on-surface);
+  margin-bottom: 8px;
+}
+
+.login-subtitle {
+  color: var(--md-on-surface-variant);
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.login-submit-btn {
+  margin-top: 8px;
+}
+
+.login-error-alert {
+  background-color: var(--md-error-container);
+  color: var(--md-on-error-container);
+  padding: 12px 16px;
+  border-radius: var(--md-shape-small);
+  margin-bottom: 24px;
+}
+
+.login-footer {
+  margin-top: 32px;
+  text-align: center;
+}
+
+/* Dashboard Page */
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.dashboard-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dashboard-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+}
+
+.stat-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--md-on-surface-variant);
+}
+
+.stat-card-value {
+  color: var(--md-on-surface);
+}
+
+.stat-card-footer {
+  margin-top: auto;
+}
+
+.dashboard-content-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 900px) {
+  .dashboard-content-grid {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+.dashboard-section {
+  padding: 24px;
+}
