@@ -1,0 +1,118 @@
+.md-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background-color: var(--md-background);
+}
+
+/* App Bar */
+.md-app-bar {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  background-color: var(--md-surface-container);
+  color: var(--md-on-surface);
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+.md-app-bar__brand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.md-app-bar__title {
+  color: var(--md-primary);
+  font-weight: 500;
+}
+
+/* Layout Main Body */
+.md-layout__main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Navigation Rail (Sidebar) */
+.md-nav-rail {
+  width: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 0;
+  background-color: var(--md-surface-container-low);
+  border-right: 1px solid var(--md-outline-variant);
+  z-index: 5;
+  flex-shrink: 0;
+}
+
+.md-nav-rail__items {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.md-nav-rail__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  color: var(--md-on-surface-variant);
+  text-decoration: none;
+  padding: 4px 0;
+}
+
+.md-nav-rail__icon-container {
+  width: 56px;
+  height: 32px;
+  border-radius: 16px; /* Pill shape for nav indicator */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--md-transition-standard);
+}
+
+.md-nav-rail__item:hover .md-nav-rail__icon-container {
+  background-color: rgba(28, 27, 31, 0.08); /* on-surface at 8% hover */
+}
+
+.md-nav-rail__item--active {
+  color: var(--md-on-surface);
+  font-weight: 700;
+}
+
+.md-nav-rail__item--active .md-nav-rail__icon-container {
+  background-color: var(--md-secondary-container);
+  color: var(--md-on-secondary-container);
+}
+
+.md-nav-rail__item--active:hover .md-nav-rail__icon-container {
+  background-color: var(--md-secondary-container);
+}
+
+/* Main Content */
+.md-main-content {
+  flex: 1;
+  overflow-y: auto;
+  background-color: var(--md-background);
+  padding: 24px;
+}
+
+.md-main-content--full {
+  padding: 0;
+}
+
+.md-main-content__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  height: 100%;
+}
